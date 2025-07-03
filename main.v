@@ -5,6 +5,7 @@ import rand
 import time
 import fgsoftware1.vloggy.vcolors
 import os
+import net.http
 
 struct Tool {
 	idx 	int
@@ -123,6 +124,9 @@ fn asky(){
 		"0" {
 			apikeys()
 		}
+		"1" {
+			myip()
+		}
 		else{
 			eprintln("Unknown tool!")
 		}
@@ -131,12 +135,17 @@ fn asky(){
 
 fn apikeys(){
 	println("0) Back")
+	println("1) Set Shodan API key")
 
 	println("\nSelect a tool (enter number): ")
 	selection := os.input('')
 	match selection {
 		"0" {
 			asky()
+		}
+		"1"{
+			sel := os.input('')
+			os.setenv("SHODAN_API_KEY", sel.str(), true)
 		}
 		else{
 			eprintln("Unknown tool!")
@@ -145,7 +154,13 @@ fn apikeys(){
 }
 
 fn myip(){
+	key := os.getenv("SHODAN_API_KEY")
+	req := http.get("https://api.shodan.io/tools/myip?key=${key}")or{
+		eprintln("$err")
+		return
+	}
 
+	println("${req.body}")
 }
 
 fn center_string(s string, width int) string {
